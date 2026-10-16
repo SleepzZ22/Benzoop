@@ -1,0 +1,10 @@
+# XAMPP / PHP / System ignores
+.vscode/
+.idea/
+*.log
+Thumbs.db
+.DS_Store
+
+# Uploaded images (keep structure)
+uploads/items/*
+!uploads/items/.gitignore

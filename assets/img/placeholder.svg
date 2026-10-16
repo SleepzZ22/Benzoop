@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f1f5f9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#grad)" rx="12" />
+  <g fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(160, 95)">
+    <rect x="0" y="0" width="80" height="60" rx="8" />
+    <circle cx="28" cy="22" r="8" />
+    <path d="M72 48 L52 28 L24 56" />
+    <path d="M40 44 L48 36 L64 52" />
+  </g>
+  <text x="200" y="195" font-family="'Kanit', sans-serif" font-size="15" fill="#64748b" text-anchor="middle" font-weight="500">ไม่มีรูปภาพแนบ</text>
+  <text x="200" y="215" font-family="'Kanit', sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">Lost &amp; Found Campus</text>
+</svg>
