@@ -39,7 +39,7 @@ class Item {
             ':status'        => in_array($data['status'] ?? 'active', ['pending', 'active', 'returned', 'rejected']) ? $data['status'] : 'active'
         ]);
 
-        return (int)$this->db->lastInsertId();
+        return Database::getLastInsertId($this->db, 'items_id_seq');
     }
 
     /**
@@ -145,8 +145,11 @@ class Item {
 
         // Filter: Keyword (title, description, location)
         if (!empty($filters['q'])) {
-            $where[] = "(i.title LIKE :q OR i.description LIKE :q OR i.location LIKE :q)";
-            $params[':q'] = '%' . trim($filters['q']) . '%';
+            $where[] = "(LOWER(i.title) LIKE :q_title OR LOWER(i.description) LIKE :q_desc OR LOWER(i.location) LIKE :q_loc)";
+            $keyword = '%' . mb_strtolower(trim($filters['q']), 'UTF-8') . '%';
+            $params[':q_title'] = $keyword;
+            $params[':q_desc']  = $keyword;
+            $params[':q_loc']   = $keyword;
         }
 
         // Filter: Type (lost/found)
@@ -232,8 +235,11 @@ class Item {
         $params = [];
 
         if (!empty($filters['q'])) {
-            $where[] = "(i.title LIKE :q OR i.description LIKE :q OR i.location LIKE :q)";
-            $params[':q'] = '%' . trim($filters['q']) . '%';
+            $where[] = "(LOWER(i.title) LIKE :q_title OR LOWER(i.description) LIKE :q_desc OR LOWER(i.location) LIKE :q_loc)";
+            $keyword = '%' . mb_strtolower(trim($filters['q']), 'UTF-8') . '%';
+            $params[':q_title'] = $keyword;
+            $params[':q_desc']  = $keyword;
+            $params[':q_loc']   = $keyword;
         }
 
         if (!empty($filters['type']) && in_array($filters['type'], ['lost', 'found'])) {

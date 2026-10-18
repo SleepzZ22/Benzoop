@@ -47,7 +47,7 @@ class Category {
             ':icon' => !empty($data['icon']) ? trim($data['icon']) : 'bi-tag',
             ':description' => !empty($data['description']) ? trim($data['description']) : null
         ]);
-        return (int)$this->db->lastInsertId();
+        return Database::getLastInsertId($this->db, 'categories_id_seq');
     }
 
     /**

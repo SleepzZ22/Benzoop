@@ -2,6 +2,8 @@
 /**
  * Database Connection Class (Singleton Pattern)
  * Lost & Found Campus System
+ * 
+ * Supports both MySQL and PostgreSQL (Supabase)
  */
 
 class Database {
@@ -13,14 +15,28 @@ class Database {
      */
     private function __construct() {
         try {
-            $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-            $options = [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . DB_CHARSET
-            ];
-            $this->connection = new PDO($dsn, DB_USER, DB_PASS, $options);
+            $driver = defined('DB_DRIVER') ? strtolower(DB_DRIVER) : 'mysql';
+
+            if ($driver === 'pgsql') {
+                $sslMode = defined('DB_SSLMODE') ? DB_SSLMODE : 'require';
+                $dsn = "pgsql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";sslmode=" . $sslMode;
+                $options = [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                ];
+                $this->connection = new PDO($dsn, DB_USER, DB_PASS, $options);
+            } else {
+                $charset = defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4';
+                $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=" . $charset;
+                $options = [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES " . $charset
+                ];
+                $this->connection = new PDO($dsn, DB_USER, DB_PASS, $options);
+            }
         } catch (PDOException $e) {
             die("Database connection failed: " . $e->getMessage());
         }
@@ -53,5 +69,15 @@ class Database {
      */
     public function getConnection(): PDO {
         return $this->connection;
+    }
+
+    /**
+     * Get last inserted ID supporting both MySQL and PostgreSQL sequence
+     */
+    public static function getLastInsertId(PDO $db, string $sequenceName = ''): int {
+        if (defined('DB_DRIVER') && strtolower(DB_DRIVER) === 'pgsql' && !empty($sequenceName)) {
+            return (int)$db->lastInsertId($sequenceName);
+        }
+        return (int)$db->lastInsertId();
     }
 }

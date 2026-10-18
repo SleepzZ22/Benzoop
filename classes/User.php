@@ -66,7 +66,7 @@ class User {
             ':role'     => $role
         ]);
 
-        return (int)$this->db->lastInsertId();
+        return Database::getLastInsertId($this->db, 'users_id_seq');
     }
 
     /**
