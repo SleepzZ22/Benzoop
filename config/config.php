@@ -22,10 +22,15 @@ if (session_status() === PHP_SESSION_NONE) {
 define('APP_NAME', 'Lost & Found Campus');
 define('APP_SUBTITLE', 'ระบบแจ้งของหายและค้นหาสิ่งของภายในมหาวิทยาลัย');
 
-// Base URL calculation
+// Base URL calculation (auto-detects /PJoop or root for built-in PHP server)
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || ($_SERVER['SERVER_PORT'] ?? 80) == 443) ? "https://" : "http://";
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-define('BASE_URL', '/PJoop');
+$scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+if (strpos($scriptDir, '/PJoop') === 0) {
+    define('BASE_URL', '/PJoop');
+} else {
+    define('BASE_URL', '');
+}
 define('FULL_BASE_URL', $protocol . $host . BASE_URL);
 
 // File Upload Settings
@@ -101,12 +106,16 @@ function hasFlash(): bool {
  * Redirect Helper
  */
 function redirect(string $path): void {
-    if (strpos($path, 'http') !== 0 && strpos($path, '/') !== 0) {
-        $path = BASE_URL . '/' . $path;
-    } elseif (strpos($path, '/') === 0 && strpos($path, BASE_URL) !== 0) {
-        $path = BASE_URL . $path;
+    if (strpos($path, 'http') === 0) {
+        header("Location: " . $path);
+        exit;
     }
-    header("Location: " . $path);
+    $base = rtrim(BASE_URL, '/');
+    $cleanPath = '/' . ltrim($path, '/');
+    if (!empty($base) && strpos($cleanPath, $base . '/') !== 0 && $cleanPath !== $base) {
+        $cleanPath = $base . $cleanPath;
+    }
+    header("Location: " . $cleanPath);
     exit;
 }
 

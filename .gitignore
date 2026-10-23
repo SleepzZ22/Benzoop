@@ -5,6 +5,5 @@
 Thumbs.db
 .DS_Store
 
-# Uploaded images (keep structure)
-uploads/items/*
-!uploads/items/.gitignore
+# Temporary and log files
+
